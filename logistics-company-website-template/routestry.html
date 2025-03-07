@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>OptiFleet - Routes Management</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Topbar Start -->
+    <div class="container-fluid bg-dark">
+        <div class="row py-2 px-lg-5">
+            <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+                <div class="d-inline-flex align-items-center text-white">
+                    <small><i class="fa fa-phone-alt mr-2"></i>+91 9562345678</small>
+                    <small class="px-3">|</small>
+                    <small><i class="fa fa-envelope mr-2"></i>optifleet@example.com</small>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center text-lg-right">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-white px-2" href="">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a class="text-white px-2" href="">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a class="text-white px-2" href="">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a class="text-white px-2" href="">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a class="text-white pl-2" href="">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+    <!-- Navbar Start -->
+    <div class="container-fluid p-0">
+        <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-lg-5">
+            <a href="index.html" class="navbar-brand ml-lg-3">
+                <h1 class="m-0 display-5 text-uppercase text-primary"><i class="fa fa-truck mr-2"></i>OptiFleet</h1>
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between px-lg-3" id="navbarCollapse">
+                <div class="navbar-nav m-auto py-0">
+                    <a href="index.html" class="nav-item nav-link">Home</a>
+                    <a href="about.html" class="nav-item nav-link">About</a>
+                    <a href="service.html" class="nav-item nav-link">Service</a>
+                    <a href="faq.html" class="nav-item nav-link">FAQs</a>
+                    <div class="nav-item dropdown">
+                        <a href="dashboard.html" class="nav-link dropdown-toggle active" id="dashboardDropdown" data-toggle="dropdown">Dashboard</a>
+                        <div class="dropdown-menu rounded-0 m-0">
+                            <a href="realtime.html" class="dropdown-item">Map view</a>
+                            <a href="fleet.html" class="dropdown-item">Fleet routes</a>
+                            <a href="routes1.html" class="dropdown-item">Add Vehicles</a>
+                        </div>
+                    </div>
+                    <a href="contact.html" class="nav-item nav-link">Contact</a>
+                </div>
+                <a href="dashboard.html" class="btn btn-primary py-2 px-4 d-none d-lg-block">Dashboard</a>
+            </div>
+        </nav>
+    </div>
+    <!-- Navbar End -->
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Route Management</h1>
+        
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Add New Route</h4>
+                        <button class="btn btn-light" data-toggle="collapse" data-target="#addRouteForm">
+                            <i class="fas fa-plus"></i> New Route
+                        </button>
+                    </div>
+                    <div class="card-body collapse" id="addRouteForm">
+                        <form id="routeForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="routeName">Route Name</label>
+                                        <input type="text" class="form-control" id="routeName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="driverName">Driver Name</label>
+                                        <input type="text" class="form-control" id="driverName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="vehicleNumber">Vehicle Number</label>
+                                        <input type="text" class="form-control" id="vehicleNumber" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="startDate">Start Date</label>
+                                        <input type="date" class="form-control" id="startDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="routeType">Route Type</label>
+                                        <select class="form-control" id="routeType">
+                                            <option value="delivery">Delivery</option>
+                                            <option value="pickup">Pickup</option>
+                                            <option value="mixed">Mixed (Delivery & Pickup)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="notes">Notes</label>
+                                        <textarea class="form-control" id="notes" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mt-4 mb-3">Stops</h5>
+                            <div id="stopsContainer">
+                                <!-- Initial stop form will be inserted here -->
+                            </div>
+                            
+                            <div class="text-center mt-3 mb-3">
+                                <button type="button" class="btn btn-outline-secondary" id="addStopBtn">
+                                    <i class="fas fa-plus-circle"></i> Add Another Stop
+                                </button>
+                            </div>
+                            
+                            <div class="form-group mt-4">
+                                <div id="routeMap" style="width: 100%; height: 300px;"></div>
+                            </div>
+                            
+                            <div class="text-right mt-4">
+                                <button type="button" class="btn btn-secondary mr-2" data-toggle="collapse" data-target="#addRouteForm">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-1"></i> Save Route
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Routes List</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="searchRoutes" placeholder="Search routes...">
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="routesTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Route Name</th>
+                                        <th>Driver</th>
+                                        <th>Vehicle</th>
+                                        <th>Start Date</th>
+                                        <th>Stops</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="routesTableBody">
+                                    <!-- Route data will be dynamically loaded here -->
+                                    <tr id="loadingRow">
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading routes...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white mt-5 py-5 px-sm-3 px-md-5">
+        <div class="row pt-5">
+            <div class="col-lg-7 col-md-6">
+                <div class="row">
+                    <div class="col-md-6 mb-5">
+                        <h3 class="text-primary mb-4">Get In Touch</h3>
+                        <p><i class="fa fa-map-marker-alt mr-2"></i>Chennai, India</p>
+                        <p><i class="fa fa-phone-alt mr-2"></i>+91 9562345678</p>
+                        <p><i class="fa fa-envelope mr-2"></i>optifleet@example.com</p>
+                        <div class="d-flex justify-content-start mt-4">
+                            <a class="btn btn-outline-light btn-social mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-light btn-social mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-light btn-social mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-5">
+                        <h3 class="text-primary mb-4">Quick Links</h3>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>About Us</a>
+                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Services</a>
+                            <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Pricing Plan</a>
+                            <a class="text-white" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-6 mb-5">
+                <h3 class="text-primary mb-4">Newsletter</h3>
+                <p>Rebum labore lorem dolores kasd est, et ipsum amet et at kasd, ipsum sea tempor magna tempor. Accu kasd sed ea duo ipsum. Dolor duo eirmod sea justo no lorem est diam</p>
+                <div class="w-100">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-light" style="padding: 30px;" placeholder="Your Email Address">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary px-4">Sign Up</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5" style="border-color: #3E3E4E !important;">
+        <div class="row">
+            <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
+                <p class="m-0 text-white">&copy; <a href="#">OPTIFLEET</a>. All Rights Reserved.</p>
+            </div>
+            <div class="col-lg-6 text-center text-md-right">
+                <ul class="nav d-inline-flex">
+                    <li class="nav-item">
+                        <a class="nav-link text-white py-0" href="#">Privacy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white py-0" href="#">Terms</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white py-0" href="#">FAQs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white py-0" href="#">Help</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- Route Detail Modal -->
+    <div class="modal fade" id="routeDetailModal" tabindex="-1" role="dialog" aria-labelledby="routeDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="routeDetailModalLabel">Route Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="routeDetailBody">
+                    <!-- Route details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a id="trackRouteBtn" href="#" class="btn btn-primary">
+                        <i class="fas fa-map-marked-alt mr-1"></i> Track on Map
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/counterup/counterup.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Contact Javascript File -->
+    <script src="mail/jqBootstrapValidation.min.js"></script>
+    <script src="mail/contact.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+
+    <!-- Firebase and Routes Script -->
+    <script type="module">
+        import { db, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "./firebaseConfig.js";
+
+        // Initialize map for route creation
+        let routeMap;
+        let mapMarkers = [];
+        let routePath;
+        let stopCount = 0;
+        
+        // Initialize route form and map when the form is shown
+        $('#addRouteForm').on('shown.bs.collapse', function () {
+            if (!routeMap) {
+                routeMap = L.map('routeMap').setView([13.0827, 80.2707], 10); // Default: Chennai
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: '&copy; OpenStreetMap contributors',
+                }).addTo(routeMap);
+                
+                // Add first stop form when initialized
+                addStopForm();
+            }
+        });
+        
+        // Add Stop button click event
+        document.getElementById('addStopBtn').addEventListener('click', addStopForm);
+        
+        // Function to add a new stop form
+        function addStopForm() {
+            const stopsContainer = document.getElementById('stopsContainer');
+            const stopIndex = stopCount++;
+            
+            const stopDiv = document.createElement('div');
+            stopDiv.className = 'stop-form mb-4 p-3 border rounded';
+            stopDiv.id = `stop-${stopIndex}`;
+            
+            stopDiv.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="m-0">Stop #${stopIndex + 1}</h6>
+                    ${stopIndex > 0 ? `<button type="button" class="btn btn-sm btn-outline-danger remove-stop" data-stop-id="${stopIndex}">
+                        <i class="fas fa-times"></i> Remove
+                    </button>` : ''}
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="stopName-${stopIndex}">Stop Name</label>
+                            <input type="text" class="form-control" id="stopName-${stopIndex}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stopAddress-${stopIndex}">Address</label>
+                            <input type="text" class="form-control" id="stopAddress-${stopIndex}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="timeWindow-${stopIndex}">Time Window</label>
+                            <input type="text" class="form-control" id="timeWindow-${stopIndex}" placeholder="e.g. 09:00 - 11:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopType-${stopIndex}">Stop Type</label>
+                            <select class="form-control" id="stopType-${stopIndex}">
+                                <option value="delivery">Delivery</option>
+                                <option value="pickup">Pickup</option>
+                                <option value="both">Both</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="stopCoords-${stopIndex}">Coordinates</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="stopCoords-${stopIndex}" placeholder="Latitude, Longitude" readonly>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-secondary location-picker" data-stop-id="${stopIndex}">
+                                        <i class="fas fa-map-marker-alt"></i> Pick on Map
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Click "Pick on Map" to set location or search for an address</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            stopsContainer.appendChild(stopDiv);
+            
+            // Add event listeners for the new stop
+            stopDiv.querySelector('.location-picker').addEventListener('click', function() {
+                const stopId = this.getAttribute('data-stop-id');
+                enableLocationPicker(stopId);
+            });
+            
+            if (stopIndex > 0) {
+                stopDiv.querySelector('.remove-stop').addEventListener('click', function() {
+                    const stopId = this.getAttribute('data-stop-id');
+                    removeStop(stopId);
+                });
+            }
+        }
+        
+        // Function to enable location picking on map
+        function enableLocationPicker(stopId) {
+            // First disable any active location pickers
+            disableAllLocationPickers();
+            
+            // Show instructions
+            routeMap.closePopup();
+            routeMap.openPopup("Click on the map to set the location for this stop", routeMap.getCenter());
+            
+            // Enable click event for map
+            routeMap.once('click', function(e) {
+                const { lat, lng } = e.latlng;
+                document.getElementById(`stopCoords-${stopId}`).value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                
+                // Add or update marker
+                updateStopMarker(stopId, [lat, lng]);
+                
+                // Update route path
+                updateRoutePath();
+                
+                routeMap.closePopup();
+            });
+        }
+        
+        // Function to disable all location pickers
+        function disableAllLocationPickers() {
+            routeMap.closePopup();
+            routeMap.off('click');
+        }
+        
+        // Function to update a stop marker
+        function updateStopMarker(stopId, coords) {
+            // Remove existing marker for this stop if it exists
+            if (mapMarkers[stopId]) {
+                routeMap.removeLayer(mapMarkers[stopId]);
+            }
+            
+            // Get stop name
+            const stopName = document.getElementById(`stopName-${stopId}`).value || `Stop #${parseInt(stopId) + 1}`;
+            
+            // Create icon based on position in route
+            const isFirst = stopId == 0;
+            const isLast = stopId == stopCount - 1;
+            
+            const markerColor = isFirst ? "green" : (isLast ? "red" : "blue");
+            
+            // Add new marker
+            mapMarkers[stopId] = L.marker(coords, {
+                draggable: true,
+                icon: L.icon({
+                    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`,
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                })
+            }).addTo(routeMap);
+            
+            // Add popup
+            mapMarkers[stopId].bindPopup(`<b>${stopName}</b><br>Drag to adjust position`);
+            
+            // Handle marker drag
+            mapMarkers[stopId].on('dragend', function(e) {
+                const { lat, lng } = e.target.getLatLng();
+                document.getElementById(`stopCoords-${stopId}`).value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                updateRoutePath();
+            });
+            
+            // Fit map to show all markers
+            const bounds = Object.values(mapMarkers).map(marker => marker.getLatLng());
+            if (bounds.length > 0) {
+                routeMap.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+        
+        // Function to update the route path on the map
+        function updateRoutePath() {
+            const coordinates = [];
+            
+            // Collect coordinates from all stops in order
+            for (let i = 0; i < stopCount; i++) {
+                const coordsInput = document.getElementById(`stopCoords-${i}`);
+                if (coordsInput && coordsInput.value) {
+                    const [lat, lng] = coordsInput.value.split(',').map(coord => parseFloat(coord.trim()));
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        coordinates.push([lat, lng]);
+                    }
+                }
+            }
+            
+            // Remove existing path
+            if (routePath) {
+                routeMap.removeLayer(routePath);
+            }
+            
+            // Draw new path if at least 2 points
+            if (coordinates.length >= 2) {
+                routePath = L.polyline(coordinates, {
+                    color: '#007bff',
+                    weight: 4,
+                    opacity: 0.7
+                }).addTo(routeMap);
+            }
+        }
+        
+        // Function to remove a stop
+        function removeStop(stopId) {
+            const stopElement = document.getElementById(`stop-${stopId}`);
+            if (stopElement) {
+                stopElement.remove();
+                
+                // Remove marker from map
+                if (mapMarkers[stopId]) {
+                    routeMap.removeLayer(mapMarkers[stopId]);
+                    delete mapMarkers[stopId];
+                }
+                
+                // Update route path
+                updateRoutePath();
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('routeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+                
+                // Collect route data
+                const routeData = {
+                    routeName: document.getElementById('routeName').value,
+                    driverName: document.getElementById('driverName').value,
+                    vehicleNumber: document.getElementById('vehicleNumber').value,
+                    startDate: document.getElementById('startDate').value,
+                    routeType: document.getElementById('routeType').value,
+                    notes: document.getElementById('notes').value,
+                    createdAt: new Date().toISOString(),
+                    status: 'active',
+                    stops: []
+                };
+                
+                // Collect stops data
+                for (let i = 0; i < stopCount; i++) {
+                    const stopElement = document.getElementById(`stop-${i}`);
+                    if (stopElement) {
+                        const coordsInput = document.getElementById(`stopCoords-${i}`);
+                        let coords = null;
+                        
+                        if (coordsInput && coordsInput.value) {
+                            coords = coordsInput.value.split(',').map(coord => parseFloat(coord.trim()));
+                        }
+                        
+                        routeData.stops.push({
+                            stopName: document.getElementById(`stopName-${i}`).value,
+                            stopAddress: document.getElementById(`stopAddress-${i}`).value,
+                            timeWindow: document.getElementById(`timeWindow-${i}`).value,
+                            stopType: document.getElementById(`stopType-${i}`).value,
+                            coords: coords
+                        });
+                    }
+                }
+                
+                // Save to Firebase
+                await addDoc(collection(db, "routes"), routeData);
+                
+                // Success message
+                alert('Route saved successfully!');
+                
+                // Reset form
+                this.reset();
+                document.getElementById('stopsContainer').innerHTML = '';
+                stopCount = 0;
+                
+                // Clear map
+                for (const marker of Object.values(mapMarkers)) {
+                    routeMap.removeLayer(marker);
+                }
+                mapMarkers = [];
+                
+                if (routePath) {
+                    routeMap.removeLayer(routePath);
+                    routePath = null;
+                }
+                
+                // Add first stop form
+                addStopForm();
+                
+                // Hide form
+                $('#addRouteForm').collapse('hide');
+                
+                // Refresh routes list
+                fetchRoutes();
+                
+            } catch (error) {
+                console.error("Error saving route:", error);
+                alert(`Error saving route: ${error.message}`);
+            } finally {
+                // Restore button state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+        
+        // Fetch and display routes
+        async function fetchRoutes() {
+            try {
+                const routesTableBody = document.getElementById('routesTableBody');
+                
+                // Show loading row
+                routesTableBody.innerHTML = `
+                    <tr id="loadingRow">
+                        <td colspan="7" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading routes...</p>
+                        </td>
+                    </tr>
+                `;
+                
+                            const querySnapshot = await getDocs(collection(db, "routes"));
+                            routesTableBody.innerHTML = '';
+                            
+                            querySnapshot.forEach((doc) => {
+                                const route = doc.data();
+                                const routeRow = `
+                                    <tr>
+                                        <td>${route.routeName}</td>
+                                        <td>${route.driverName}</td>
+                                        <td>${route.vehicleNumber}</td>
+                                        <td>${route.startDate}</td>
+                                        <td>${route.stops.length}</td>
+                                        <td>${route.status}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary view-route" data-route-id="${doc.id}">View</button>
+                                            <button class="btn btn-sm btn-danger delete-route" data-route-id="${doc.id}">Delete</button>
+                                        </td>
+                                    </tr>
+                                `;
+                                routesTableBody.insertAdjacentHTML('beforeend', routeRow);
+                            });
+                            
+                            // Add event listeners for view and delete buttons
+                            document.querySelectorAll('.view-route').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const routeId = this.getAttribute('data-route-id');
+                                    viewRoute(routeId);
+                                });
+                            });
+                            
+                            document.querySelectorAll('.delete-route').forEach(button => {
+                                button.addEventListener('click', function() {
+                                    const routeId = this.getAttribute('data-route-id');
+                                    deleteRoute(routeId);
+                                });
+                            });
+                        } catch (error) {
+                            console.error("Error fetching routes:", error);
+                            alert(`Error fetching routes: ${error.message}`);
+                        }
+                    }
+                    
+                    // Initial fetch of routes
+                    fetchRoutes();
+                </script>

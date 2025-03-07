@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Optimization Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            text-align: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .menu {
+            flex: 1;
+        }
+        
+        .menu a {
+            display: block;
+            padding: 15px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        
+        .menu a:hover, .menu a.active {
+            background-color: #34495e;
+            border-left: 4px solid #3498db;
+        }
+        
+        .menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background-color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .dashboard-content {
+            padding: 20px;
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .route-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .route-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .route-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .route-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .route-info {
+            margin-bottom: 15px;
+        }
+        
+        .route-info p {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .route-info i {
+            width: 20px;
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .stops-list {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .stops-list ul {
+            list-style-type: none;
+        }
+        
+        .stops-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stops-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .map-container {
+            flex: 1;
+            height: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .map-header h2 {
+            color: #2c3e50;
+        }
+        
+        .back-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .route-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">OptiFleet</div>
+            <div class="menu">
+                <a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="rout.html"><i class="fas fa-route"></i> Routes</a>
+                <a href="#"><i class="fas fa-user"></i> Drivers</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Stops</a>
+                <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="User Profile">
+                    <span>Admin User</span>
+                </div>
+            </div>
+            
+            <div class="dashboard-content">
+                <div id="routes-view">
+                    <h2 style="margin-bottom: 20px;">Active Routes</h2>
+                    <div class="route-cards" id="route-cards-container">
+                        <!-- Route cards will be dynamically populated here -->
+                    </div>
+                </div>
+                
+                <div id="map-view" style="display:none;">
+                    <div class="map-header">
+                        <h2 id="selected-route-title">Route Details</h2>
+                        <button class="back-button" id="back-to-routes"><i class="fas fa-arrow-left"></i> Back to Routes</button>
+                    </div>
+                    
+                    <div class="route-stats">
+                        <div class="stat-card">
+                            <h3>Total Distance</h3>
+                            <p id="total-distance">0 km</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Estimated Time</h3>
+                            <p id="estimated-time">0 min</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Number of Stops</h3>
+                            <p id="num-stops">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="map-container">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data structure for routes with assigned drivers and stops
+        let savedRoutes = [
+            {
+                id: 1,
+                routeName: "Downtown Delivery Route",
+                driverName: "John Smith",
+                vehicleNumber: "Van #104",
+                stops: [
+                    { stopName: "Central Office", coords: [40.7128, -74.0060], timeWindow: "9:00 AM - 11:00 AM" },
+                    { stopName: "Main Street Shop", coords: [40.7200, -74.0100], timeWindow: "11:30 AM - 1:30 PM" },
+                    { stopName: "Park Avenue Store", coords: [40.7180, -74.0050], timeWindow: "2:00 PM - 4:00 PM" },
+                    { stopName: "Broadway Market", coords: [40.7150, -74.0080], timeWindow: "4:30 PM - 6:30 PM" }
+                ],
+                status: "In Progress"
+            },
+            {
+                id: 2,
+                routeName: "Uptown Distribution",
+                driverName: "Sarah Johnson",
+                vehicleNumber: "Truck #205",
+                stops: [
+                    { stopName: "North Plaza", coords: [40.8128, -73.9560], timeWindow: "8:00 AM - 10:00 AM" },
+                    { stopName: "Highland Park Depot", coords: [40.8200, -73.9500], timeWindow: "10:30 AM - 12:30 PM" },
+                    { stopName: "Riverside Warehouse", coords: [40.8180, -73.9450], timeWindow: "1:00 PM - 3:00 PM" },
+                    { stopName: "East End Market", coords: [40.8150, -73.9480], timeWindow: "3:30 PM - 5:30 PM" },
+                    { stopName: "Summit Distribution Center", coords: [40.8100, -73.9400], timeWindow: "6:00 PM - 8:00 PM" }
+                ],
+                status: "Scheduled"
+            }
+        ];
+
+        // Function to load routes from localStorage
+        function loadSavedRoutes() {
+            const storedRoutes = localStorage.getItem('routes');
+            if (storedRoutes) {
+                try {
+                    const parsedRoutes = JSON.parse(storedRoutes);
+                    if (Array.isArray(parsedRoutes) && parsedRoutes.length > 0) {
+                        // Merge with sample routes - add new routes from localStorage
+                        const existingIds = savedRoutes.map(route => route.id);
+                        parsedRoutes.forEach(route => {
+                            // Convert the Firebase format to our dashboard format if needed
+                            const processedRoute = {
+                                id: route.id || Math.floor(Math.random() * 1000),
+                                routeName: route.routeName,
+                                driverName: route.driverName,
+                                vehicleNumber: route.vehicleNumber,
+                                stops: route.stops || [],
+                                status: "Scheduled"
+                            };
+                            
+                            if (!existingIds.includes(processedRoute.id)) {
+                                savedRoutes.push(processedRoute);
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error parsing stored routes:', e);
+                }
+            }
+        }
+
+        // Load routes when page loads
+        loadSavedRoutes();
+
+        // Function to populate route cards
+        function populateRouteCards() {
+            const container = document.getElementById('route-cards-container');
+            container.innerHTML = '';
+
+            savedRoutes.forEach(route => {
+                const card = document.createElement('div');
+                card.className = 'route-card';
+                card.dataset.routeId = route.id;
+
+                card.innerHTML = `
+                    <h3>${route.routeName}</h3>
+                    <div class="route-info">
+                        <p><i class="fas fa-user"></i> ${route.driverName}</p>
+                        <p><i class="fas fa-truck"></i> ${route.vehicleNumber}</p>
+                        <p><i class="fas fa-info-circle"></i> Status: <span style="color: ${route.status === 'In Progress' ? '#e67e22' : '#2ecc71'}">${route.status}</span></p>
+                        <p><i class="fas fa-map-marker-alt"></i> Stops: ${route.stops.length}</p>
+                    </div>
+                    <div class="stops-list">
+                        <ul>
+                            ${route.stops.map(stop => `<li>${stop.stopName}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => showRouteDetails(route.id));
+                container.appendChild(card);
+            });
+        }
+
+        // Function to show route details and map
+        function showRouteDetails(routeId) {
+            const route = savedRoutes.find(r => r.id === routeId);
+            if (!route) return;
+
+            // Update the UI
+            document.getElementById('routes-view').style.display = 'none';
+            document.getElementById('map-view').style.display = 'block';
+            
+            document.getElementById('selected-route-title').textContent = route.routeName;
+            document.getElementById('total-distance').textContent = calculateDistance(route.stops) + ' km';
+            document.getElementById('estimated-time').textContent = calculateTime(route.stops) + ' min';
+            document.getElementById('num-stops').textContent = route.stops.length;
+
+            // Initialize the map
+            initMap(route);
+        }
+
+        // Function to calculate an estimated distance (simplified)
+        function calculateDistance(stops) {
+            if (stops.length < 2) return 0;
+            
+            let totalDistance = 0;
+            for (let i = 0; i < stops.length - 1; i++) {
+                const start = stops[i];
+                const end = stops[i + 1];
+                totalDistance += haversineDistance(start.coords[0], start.coords[1], end.coords[0], end.coords[1]);
+            }
+            
+            return totalDistance.toFixed(2);
+        }
+
+        // Haversine formula to calculate distance between two points
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Function to calculate estimated time (simplified)
+        function calculateTime(stops) {
+            const distance = calculateDistance(stops);
+            // Assuming average speed of 30 km/h
+            const time = (distance / 30) * 60;
+            return Math.round(time);
+        }
+
+        // Initialize map with route
+        function initMap(route) {
+            // Clear previous map
+            const mapContainer = document.getElementById('map');
+            mapContainer.innerHTML = '';
+            
+            // Initialize Leaflet map
+            const map = L.map('map');
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            if (!route.stops || route.stops.length === 0) {
+                map.setView([40.7128, -74.0060], 12);
+                return;
+            }
+            
+            // Add markers for each stop
+            const markers = [];
+            const polylinePoints = [];
+            
+            route.stops.forEach((stop, index) => {
+                if (!stop.coords || stop.coords.length !== 2) {
+                    console.error("Invalid coordinates for stop:", stop);
+                    return;
+                }
+                
+                // Determine marker icon based on position
+                let markerIcon;
+                if (index === 0) {
+                    markerIcon = "green-dot.png"; // Start point
+                } else if (index === route.stops.length - 1) {
+                    markerIcon = "red-dot.png"; // End point
+                } else {
+                    markerIcon = "yellow-dot.png"; // Middle points
+                }
+                
+                const marker = L.marker(stop.coords, {
+                    icon: L.icon({
+                        iconUrl: `https://maps.google.com/mapfiles/ms/icons/${markerIcon}`,
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map);
+                
+                marker.bindPopup(`<b>Stop ${index + 1}: ${stop.stopName}</b><br>Time: ${stop.timeWindow}`);
+                markers.push(marker);
+                polylinePoints.push(stop.coords);
+            });
+            
+            // Draw the route path
+            const polyline = L.polyline(polylinePoints, {color: '#3498db', weight: 4}).addTo(map);
+            
+            // Fit the map to show all markers
+            if (polylinePoints.length > 0) {
+                const bounds = L.latLngBounds(polylinePoints);
+                map.fitBounds(bounds, {padding: [50, 50]});
+            }
+        }
+
+        // Event listener for back button
+        document.getElementById('back-to-routes').addEventListener('click', () => {
+            document.getElementById('routes-view').style.display = 'block';
+            document.getElementById('map-view').style.display = 'none';
+        });
+
+        // Initialize the dashboard
+        window.addEventListener('load', () => {
+            populateRouteCards();
+        });
+    </script>
+</body>
+</html>

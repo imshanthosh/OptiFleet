@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - OPTIFLEET</title>
+    
+    <!-- External Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background-color: #FF4800;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .sidebar h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #e03e00;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Driver Details Section */
+        .driver-details {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .driver-details h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .driver-info {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Dashboard Widgets */
+        .widgets {
+            display: flex;
+            gap: 20px;
+        }
+
+        .widget {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            text-align: center;
+        }
+
+        .widget h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .widget p {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Recent Deliveries Section */
+        .recent-trips {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .trip {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .trip:last-child {
+            border-bottom: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="container">
+        <nav class="sidebar">
+            <h1>Driver Dashboard</h1>
+            <ul>
+                <li><a href="index1.html"><i class="fas fa-home"></i>&nbsp; Home</a></li>
+                <li><a href="routes.html"><i class="fas fa-route"></i>&nbsp; Routes</a></li>
+                <li><a href="fleet.html"><i class="fas fa-truck"></i>&nbsp; My Fleet</a></li>
+                <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i>&nbsp; Live Tracking</a></li>
+                <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i>&nbsp; Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2>Welcome, <span id="driverName">Loading...</span></h2>
+            </div>
+
+            <!-- Driver Details -->
+            <div class="driver-details">
+                <h3>Driver Details</h3>
+                <div class="driver-info">
+                    <p><strong>Name:</strong> <span id="name"></span></p>
+                    <p><strong>Vehicle:</strong> <span id="vehicle"></span></p>
+                    <p><strong>Phone:</strong> <span id="phone"></span></p>
+                    <p><strong>Email:</strong> <span id="email"></span></p>
+                </div>
+            </div>
+
+            <!-- Dashboard Widgets -->
+            <div class="widgets">
+                <div class="widget">
+                    <h3>Total Deliveries</h3>
+                    <p id="totalDeliveries">Loading...</p>
+                </div>
+                <div class="widget">
+                    <h3>On-time Deliveries</h3>
+                    <p id="onTimeDeliveries">Loading...</p>
+                </div>
+                <div class="widget">
+                    <h3>Upcoming Trips</h3>
+                    <p id="upcomingTrips">Loading...</p>
+                </div>
+            </div>
+
+            <!-- Recent Deliveries -->
+            <div class="recent-trips">
+                <h3>Recent Deliveries</h3>
+                <div id="deliveriesList">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Configuration & Data Fetching -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Fetch Driver Details
+        db.ref("drivers/driver1").on("value", (snapshot) => {
+            let data = snapshot.val();
+            document.getElementById("driverName").innerText = data.name;
+            document.getElementById("name").innerText = data.name;
+            document.getElementById("vehicle").innerText = data.vehicle;
+            document.getElementById("phone").innerText = data.phone;
+            document.getElementById("email").innerText = data.email;
+        });
+
+        // Fetch Statistics
+        db.ref("stats").on("value", (snapshot) => {
+            let stats = snapshot.val();
+            document.getElementById("totalDeliveries").innerText = stats.totalDeliveries;
+            document.getElementById("onTimeDeliveries").innerText = stats.onTimeDeliveries + "%";
+            document.getElementById("upcomingTrips").innerText = stats.upcomingTrips;
+        });
+
+        // Fetch Recent Deliveries
+        db.ref("deliveries").on("value", (snapshot) => {
+            let deliveries = snapshot.val();
+            let output = "";
+            for (let key in deliveries) {
+                output += `<div class="trip"><span>📦 ${deliveries[key].orderId}</span><span>${deliveries[key].status}</span></div>`;
+            }
+            document.getElementById("deliveriesList").innerHTML = output;
+        });
+    </script>
+
+</body>
+</html>

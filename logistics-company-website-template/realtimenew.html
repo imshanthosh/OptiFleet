@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Tracking</title>
+  
+  <!-- Leaflet JS & CSS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+  <style>
+    #map {
+      height: 500px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div class="min-h-screen flex">
+    <aside class="w-64 bg-blue-800 text-white flex-shrink-0">
+      <div class="p-6 text-center font-bold text-xl">Fleet Dashboard</div>
+      <nav class="mt-6">
+        <a href="dashboard.html" class="block py-2 px-4 hover:bg-blue-700">Dashboard</a>
+        <a href="realtime.html" class="block py-2 px-4 bg-blue-700">Real-Time Tracking</a>
+        <a href="routes1.html" class="block py-2 px-4 hover:bg-blue-700">Routes</a>
+        <a href="fleet.html" class="block py-2 px-4 hover:bg-blue-700">Fleet</a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6">
+      <header class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold">Real-Time Tracking</h1>
+        <button onclick="location.reload();" class="px-4 py-2 bg-blue-600 text-white rounded-md">
+          Refresh Data
+        </button>
+      </header>
+
+      <!-- Driver Selection -->
+      <section class="bg-white shadow-md rounded-md p-4 mb-6">
+        <label class="block text-lg font-semibold mb-2">Select Driver:</label>
+        <select id="driver-select" class="w-full p-2 border rounded-md">
+          <option value="">Select a driver</option>
+        </select>
+      </section>
+
+      <!-- Map Section -->
+      <section id="map-container" class="bg-white shadow-md rounded-md p-4 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Live Vehicle Location</h2>
+        <div id="map"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // 🔹 Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAiRA2Ew_t2cfmOCixhLVwNZ2BMJ3HOhWI",
+      authDomain: "routeoptimization-e2162.firebaseapp.com",
+      projectId: "routeoptimization-e2162",
+      storageBucket: "routeoptimization-e2162.appspot.com",
+      messagingSenderId: "287580624829",
+      appId: "1:287580624829:web:f6454a9f591b7affda24d4",
+      measurementId: "G-2Q24H2CNDZ"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 🔹 Map Setup
+    const map = L.map("map").setView([13.0827, 80.2707], 7); // Default to Chennai coordinates
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    const apiKey = "Y131b911d-a302-40a0-8a9a-d498fbf68645"; // Replace with your GraphHopper API key
+    const driverDropdown = document.getElementById("driver-select");
+
+    // 🔹 Fetch and Populate Driver Dropdown
+    db.ref("routes").once("value", (snapshot) => {
+      snapshot.forEach((childSnapshot) => {
+        const driverKey = childSnapshot.key;
+        const driverName = childSnapshot.val().name;
+        let option = document.createElement("option");
+        option.value = driverKey;
+        option.textContent = driverName;
+        driverDropdown.appendChild(option);
+      });
+    });
+
+    // 🔹 Fetch and Display Optimized Route on Selection
+    driverDropdown.addEventListener("change", async () => {
+      const driverId = driverDropdown.value;
+      if (!driverId) return;
+
+      db.ref("routes/" + driverId).once("value", async (snapshot) => {
+        if (!snapshot.exists()) return;
+
+        const { source, destination, stops } = snapshot.val();
+
+        // Geocode source, destination, and stops
+        const geocode = async (location) => {
+          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`);
+          const data = await response.json();
+          return data.length > 0 ? [parseFloat(data[0].lat), parseFloat(data[0].lon)] : null;
+        };
+
+        const sourceCoords = await geocode(source);
+        const destinationCoords = await geocode(destination);
+        const stopCoords = stops ? await Promise.all(stops.map(geocode)) : [];
+
+        if (!sourceCoords || !destinationCoords) {
+          console.error("Could not geocode source or destination");
+          return;
+        }
+
+        // Combine all coordinates for optimization
+        const allCoords = [sourceCoords, ...stopCoords, destinationCoords];
+
+        // Fetch optimized route
+        const optimizedRoute = await getOptimizedRoute(allCoords);
+        if (!optimizedRoute) {
+          console.error("No optimized route found");
+          return;
+        }
+
+        // Extract points from the optimized route
+        const routePoints = optimizedRoute.points.coordinates.map(coord => [coord[1], coord[0]]); // Format: [lat, lon]
+
+        // Clear existing layers
+        map.eachLayer(layer => {
+          if (layer instanceof L.Polyline || layer instanceof L.Marker) {
+            map.removeLayer(layer);
+          }
+        });
+
+        // Draw the optimized route
+        L.polyline(routePoints, { color: "blue", weight: 5 }).addTo(map);
+
+        // Add markers for source, stops, and destination
+        L.marker(sourceCoords).addTo(map).bindPopup("Source: " + source);
+        stopCoords.forEach((coords, index) => L.marker(coords).addTo(map).bindPopup(`Stop ${index + 1}`));
+        L.marker(destinationCoords).addTo(map).bindPopup("Destination: " + destination);
+
+        // Fit the map to the route bounds
+        const bounds = L.latLngBounds(routePoints);
+        map.fitBounds(bounds);
+      });
+    });
+
+    // 🔹 Function to Fetch Optimized Route from GraphHopper
+    async function getOptimizedRoute(stops) {
+      const points = stops.map(stop => `${stop[0]},${stop[1]}`).join("|"); // Format: "lat,lon|lat,lon|..."
+      const url = `https://graphhopper.com/api/1/route?point=${points}&vehicle=car&key=${apiKey}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("API request failed");
+        const data = await response.json();
+        return data.paths[0]; // Return the first optimized route
+      } catch (error) {
+        console.error("Error fetching optimized route:", error);
+        return null;
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+
+

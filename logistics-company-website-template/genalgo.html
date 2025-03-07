@@ -1,0 +1,178 @@
+// Firebase Configuration (Replace with your actual Firebase config)
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Fetch stops from Firebase
+async function fetchStops() {
+    let stops = [];
+    const snapshot = await db.collection("stops").get();
+    snapshot.forEach((doc) => {
+        let data = doc.data();
+        stops.push({
+            id: doc.id,
+            name: data.stopName,
+            address: data.stopAddress,
+            timeWindow: data.timeWindow,  // e.g., "9:00 AM - 12:00 PM"
+            priority: data.priority,       // Higher number = higher priority
+            lat: data.lat,                 // Latitude (assumed in Firestore)
+            lon: data.lon                  // Longitude (assumed in Firestore)
+        });
+    });
+    return stops;
+}
+
+// Genetic Algorithm Implementation
+class GeneticAlgorithm {
+    constructor(stops, populationSize, generations, mutationRate, crossoverRate) {
+        this.stops = stops;
+        this.populationSize = populationSize;
+        this.generations = generations;
+        this.mutationRate = mutationRate;
+        this.crossoverRate = crossoverRate;
+    }
+
+    generatePopulation() {
+        let population = [];
+        for (let i = 0; i < this.populationSize; i++) {
+            let shuffledStops = [...this.stops].sort(() => Math.random() - 0.5);
+            population.push(shuffledStops);
+        }
+        return population;
+    }
+
+    calculateFitness(route) {
+        let score = 0;
+        let currentTime = 0;
+
+        for (let stop of route) {
+            let [start, end] = stop.timeWindow.split(" - ");
+            let startMinutes = this.convertToMinutes(start);
+            let endMinutes = this.convertToMinutes(end);
+
+            if (currentTime < startMinutes) {
+                score += (startMinutes - currentTime) * 2;
+            }
+            if (currentTime > endMinutes) {
+                score += 1000;
+            }
+
+            score += (5 - stop.priority) * 10;
+            currentTime += 30; // Assume each stop takes 30 minutes
+        }
+        return score;
+    }
+
+    convertToMinutes(timeStr) {
+        let [time, period] = timeStr.split(" ");
+        let [hours, minutes] = time.split(":").map(Number);
+        if (period === "PM" && hours !== 12) hours += 12;
+        if (period === "AM" && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+    }
+
+    selection(population) {
+        return population.sort((a, b) => this.calculateFitness(a) - this.calculateFitness(b)).slice(0, this.populationSize / 2);
+    }
+
+    crossover(parent1, parent2) {
+        if (Math.random() > this.crossoverRate) return parent1;
+        let start = Math.floor(Math.random() * parent1.length);
+        let end = Math.floor(Math.random() * parent1.length);
+        if (start > end) [start, end] = [end, start];
+
+        let child = new Array(parent1.length).fill(null);
+        for (let i = start; i <= end; i++) {
+            child[i] = parent1[i];
+        }
+
+        let parent2Index = 0;
+        for (let i = 0; i < child.length; i++) {
+            if (child[i] === null) {
+                while (child.includes(parent2[parent2Index])) {
+                    parent2Index++;
+                }
+                child[i] = parent2[parent2Index];
+            }
+        }
+        return child;
+    }
+
+    mutate(route) {
+        if (Math.random() < this.mutationRate) {
+            let idx1 = Math.floor(Math.random() * route.length);
+            let idx2 = Math.floor(Math.random() * route.length);
+            [route[idx1], route[idx2]] = [route[idx2], route[idx1]];
+        }
+        return route;
+    }
+
+    async run() {
+        let population = this.generatePopulation();
+        let bestRoute = population[0];
+        let bestScore = this.calculateFitness(bestRoute);
+
+        for (let gen = 0; gen < this.generations; gen++) {
+            let selected = this.selection(population);
+            let newPopulation = [];
+
+            while (newPopulation.length < this.populationSize) {
+                let parent1 = selected[Math.floor(Math.random() * selected.length)];
+                let parent2 = selected[Math.floor(Math.random() * selected.length)];
+                let child = this.crossover(parent1, parent2);
+                child = this.mutate(child);
+                newPopulation.push(child);
+            }
+
+            population = newPopulation;
+
+            let currentBest = this.selection(population)[0];
+            let currentBestScore = this.calculateFitness(currentBest);
+
+            if (currentBestScore < bestScore) {
+                bestRoute = currentBest;
+                bestScore = currentBestScore;
+            }
+        }
+        return bestRoute;
+    }
+}
+
+// Function to Generate Optimized Route
+async function generateOptimizedRoute() {
+    let stops = await fetchStops();
+    let ga = new GeneticAlgorithm(stops, 10, 50, 0.1, 0.8);
+    let optimizedRoute = await ga.run();
+
+    plotOptimizedRoute(optimizedRoute);
+}
+
+// Plot Optimized Route on OpenStreetMap
+function plotOptimizedRoute(route) {
+    let map = L.map('map').setView([route[0].lat, route[0].lon], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    route.forEach((stop, index) => {
+        L.marker([stop.lat, stop.lon]).addTo(map)
+            .bindPopup(`<b>${index + 1}. ${stop.name}</b><br>Time: ${stop.timeWindow}<br>Priority: ${stop.priority}`);
+    });
+
+    let routeCoordinates = route.map(stop => [stop.lat, stop.lon]);
+    L.polyline(routeCoordinates, { color: 'blue' }).addTo(map);
+}
+
+// Button Click to Trigger Optimization
+$("#generateRoute").click(function () {
+    generateOptimizedRoute().then(() => alert("Optimized Route Generated!"));
+});

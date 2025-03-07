@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delivery Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <!-- For interactive zooming -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f9;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .chart-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .chart-box {
+        width: 48%;
+        min-width: 300px;
+      }
+
+      .filter-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      select {
+        padding: 5px 10px;
+        font-size: 16px;
+      }
+
+      .filter-container select,
+      .filter-container button {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Topbar Start -->
+    <div class="container-fluid bg-dark">
+      <div class="row py-2 px-lg-5">
+          <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+              <div class="d-inline-flex align-items-center text-white">
+                  <small><i class="fa fa-phone-alt mr-2"></i>+91 9562345678</small>
+                  <small class="px-3">|</small>
+                  <small><i class="fa fa-envelope mr-2"></i>optifleet@gmail.com</small>
+              </div>
+          </div>
+          <div class="col-lg-6 text-center text-lg-right">
+              <div class="d-inline-flex align-items-center">
+                  <a class="text-white px-2" href="">
+                      <i class="fab fa-facebook-f"></i>
+                  </a>
+                  <a class="text-white px-2" href="">
+                      <i class="fab fa-twitter"></i>
+                  </a>
+                  <a class="text-white px-2" href="">
+                      <i class="fab fa-linkedin-in"></i>
+                  </a>
+                  <a class="text-white px-2" href="">
+                      <i class="fab fa-instagram"></i>
+                  </a>
+                  <a class="text-white pl-2" href="">
+                      <i class="fab fa-youtube"></i>
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- Topbar End -->
+
+
+  <!-- Navbar Start -->
+  <div class="container-fluid p-0">
+      <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-lg-5">
+          <a href="index1.html" class="navbar-brand ml-lg-3">
+              <h1 class="m-0 display-5 text-uppercase text-primary"><i class="fa fa-truck mr-2"></i>OPTIFLEET</h1>
+          </a>
+          <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-between px-lg-3" id="navbarCollapse">
+              <div class="navbar-nav m-auto py-0">
+                  <a href="index1.html" class="nav-item nav-link">Home</a>
+                  <a href="about.html" class="nav-item nav-link active">About</a>
+                  <a href="service.html" class="nav-item nav-link">Features</a>
+                  <a href="faq.html" class="nav-item nav-link">FAQs</a>
+                  <!--<div class="nav-item dropdown">
+                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                      <div class="dropdown-menu rounded-0 m-0">
+                          <a href="blog.html" class="dropdown-item">Blog Grid</a>
+                          <a href="single.html" class="dropdown-item">Blog Detail</a>
+                      </div>
+                  </div>-->
+                  <a href="contact.html" class="nav-item nav-link">Contact</a>
+              </div>
+              <a href="login.html" class="btn btn-primary" style="background-color: #FF4800; color: #fff; padding: 10px 20px; border-radius: 4px; text-transform: uppercase;">Get Started</a>
+          </div>
+      </nav>
+  </div>
+  <!-- Navbar End -->
+
+    <div class="container">
+      <h1>Delivery Performance Report</h1>
+
+      <!-- Filter Options for Data Visualization -->
+      <div class="filter-container">
+        <select id="delivery-month" onchange="updateCharts()">
+          <option value="January">January</option>
+          <option value="February">February</option>
+          <option value="March">March</option>
+          <option value="April">April</option>
+        </select>
+        <button onclick="exportReport()">Export Report</button>
+      </div>
+
+      <!-- Chart Containers -->
+      <div class="chart-container">
+        <div class="chart-box">
+          <canvas id="deliveryPerformanceChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <canvas id="fuelConsumptionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-box">
+          <canvas id="routeEfficiencyChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Sample Data (replace this with real data fetching logic)
+      const deliveryData = {
+        January: {
+          performance: [85, 90, 78, 88],
+          fuelConsumption: [120, 110, 115, 130],
+          efficiency: [80, 75, 70, 85],
+        },
+        February: {
+          performance: [88, 85, 90, 95],
+          fuelConsumption: [125, 120, 118, 115],
+          efficiency: [78, 80, 77, 85],
+        },
+        March: {
+          performance: [92, 89, 85, 91],
+          fuelConsumption: [130, 135, 128, 140],
+          efficiency: [85, 82, 81, 90],
+        },
+        April: {
+          performance: [80, 84, 88, 91],
+          fuelConsumption: [122, 125, 118, 130],
+          efficiency: [76, 74, 79, 83],
+        },
+      };
+
+      // Initial Chart Data
+      let currentMonth = "January";
+      const performanceData = deliveryData[currentMonth].performance;
+      const fuelData = deliveryData[currentMonth].fuelConsumption;
+      const efficiencyData = deliveryData[currentMonth].efficiency;
+
+      // Function to Update Charts based on Month Selection
+      function updateCharts() {
+        const selectedMonth = document.getElementById("delivery-month").value;
+        currentMonth = selectedMonth;
+        updateChartData(selectedMonth);
+      }
+
+      // Update chart data dynamically
+      function updateChartData(month) {
+        const newPerformanceData = deliveryData[month].performance;
+        const newFuelData = deliveryData[month].fuelConsumption;
+        const newEfficiencyData = deliveryData[month].efficiency;
+
+        deliveryPerformanceChart.data.datasets[0].data = newPerformanceData;
+        fuelConsumptionChart.data.datasets[0].data = newFuelData;
+        routeEfficiencyChart.data.datasets[0].data = newEfficiencyData;
+
+        deliveryPerformanceChart.update();
+        fuelConsumptionChart.update();
+        routeEfficiencyChart.update();
+      }
+
+      // Function to Export Report (example placeholder)
+      function exportReport() {
+        alert("Exporting report for " + currentMonth);
+      }
+
+      // Delivery Performance Chart
+      const ctx1 = document
+        .getElementById("deliveryPerformanceChart")
+        .getContext("2d");
+      const deliveryPerformanceChart = new Chart(ctx1, {
+        type: "bar",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [
+            {
+              label: "Delivery Performance (%)",
+              data: performanceData,
+              backgroundColor: "rgba(75, 192, 192, 0.6)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  return tooltipItem.raw + "% Performance";
+                },
+              },
+            },
+          },
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: "xy",
+            },
+            zoom: {
+              enabled: true,
+              mode: "xy",
+            },
+          },
+        },
+      });
+
+      // Fuel Consumption Chart
+      const ctx2 = document
+        .getElementById("fuelConsumptionChart")
+        .getContext("2d");
+      const fuelConsumptionChart = new Chart(ctx2, {
+        type: "line",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [
+            {
+              label: "Fuel Consumption (liters)",
+              data: fuelData,
+              fill: false,
+              borderColor: "rgba(255, 99, 132, 1)",
+              tension: 0.1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  return tooltipItem.raw + " liters";
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Route Efficiency Chart
+      const ctx3 = document
+        .getElementById("routeEfficiencyChart")
+        .getContext("2d");
+      const routeEfficiencyChart = new Chart(ctx3, {
+        type: "radar",
+        data: {
+          labels: ["Route 1", "Route 2", "Route 3", "Route 4"],
+          datasets: [
+            {
+              label: "Route Efficiency (%)",
+              data: efficiencyData,
+              backgroundColor: "rgba(153, 102, 255, 0.2)",
+              borderColor: "rgba(153, 102, 255, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scale: {
+            ticks: {
+              beginAtZero: true,
+              max: 100,
+            },
+          },
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  return tooltipItem.raw + "% Efficiency";
+                },
+              },
+            },
+          },
+        },
+      });
+    </script>
+    
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white mt-5 py-5 px-sm-3 px-md-5">
+      <div class="row pt-5">
+          <div class="col-lg-7 col-md-6">
+              <div class="row">
+                  <div class="col-md-6 mb-5">
+                      <h3 class="text-primary mb-4">Get In Touch</h3>
+                      <p><i class="fa fa-map-marker-alt mr-2"></i>Chennai,India</p>
+                      <p><i class="fa fa-phone-alt mr-2"></i>+91 9562345678 </p>
+                      <p><i class="fa fa-envelope mr-2"></i>optifleet@example.com</p>
+                      <div class="d-flex justify-content-start mt-4">
+                          <a class="btn btn-outline-light btn-social mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                          <a class="btn btn-outline-light btn-social mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                          <a class="btn btn-outline-light btn-social mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                          <a class="btn btn-outline-light btn-social" href="#"><i class="fab fa-instagram"></i></a>
+                      </div>
+                  </div>
+                  <div class="col-md-6 mb-5">
+                      <h3 class="text-primary mb-4">Quick Links</h3>
+                      <div class="d-flex flex-column justify-content-start">
+                          <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                          <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>About Us</a>
+                          <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Services</a>
+                          <a class="text-white mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Pricing Plan</a>
+                          <a class="text-white" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-5 col-md-6 mb-5">
+              <h3 class="text-primary mb-4">Newsletter</h3>
+              <p>Reduce costs, minimize delays, and enhance efficiency with real-time tracking and smart route optimization. Try OptiFleet today! 🚀</p>
+              <div class="w-100">
+                  <div class="input-group">
+                      <input type="text" class="form-control border-light" style="padding: 30px;" placeholder="Your Email Address">
+                      <div class="input-group-append">
+                          <button class="btn btn-primary px-4">Sign Up</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5" style="border-color: #3E3E4E !important;">
+      <div class="row">
+          <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
+              <p class="m-0 text-white">&copy; <a href="#">OPTIFLEET</a>. All Rights Reserved. 
+      
+      <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/
+      Designed by <a href="https://htmlcodex.com">HTML Codex</a>-->
+              </p>
+          </div>
+          <div class="col-lg-6 text-center text-md-right">
+              <ul class="nav d-inline-flex">
+                  <li class="nav-item">
+                      <a class="nav-link text-white py-0" href="#">Privacy</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link text-white py-0" href="#">Terms</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link text-white py-0" href="#">FAQs</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link text-white py-0" href="#">Help</a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  <!-- Footer End -->
+
+  <!-- Back to Top -->
+  <a href="#" class="btn btn-lg btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+  <!-- JavaScript Libraries -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+  <script src="lib/easing/easing.min.js"></script>
+  <script src="lib/waypoints/waypoints.min.js"></script>
+  <script src="lib/counterup/counterup.min.js"></script>
+  <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+  <!-- Contact Javascript File -->
+  <script src="mail/jqBootstrapValidation.min.js"></script>
+  <script src="mail/contact.js"></script>
+
+  <!-- Template Javascript -->
+  <script src="js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            height: 80vh;
+            width: 90%;
+            margin: auto;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h2>Optimized Route</h2>
+    <p id="route-info"></p>
+    <div id="map" style="width: 100%; height: 500px;"></div>
+    <a href="dashboard.html">Go Back</a>
+
+    <script type="module">
+      import { db, doc, getDocs } from "./firebaseConfig.js";
+  
+      const urlParams = new URLSearchParams(window.location.search);
+      const routeId = urlParams.get('routeId');
+      console.log("Route ID:", routeId);
+  
+      async function loadRoute() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const routeId = urlParams.get('routeId');
+    console.log("Route ID:", routeId); // Log the route ID
+
+    if (!routeId) {
+        alert("No route ID provided.");
+        return;
+    }
+
+    const routeDoc = await getDocs(doc(db, "routes", routeId));
+    if (!routeDoc.exists()) {
+        alert("Route not found.");
+        return;
+    }
+
+    const route = routeDoc.data();
+    console.log("Fetched Route:", route); // Log the entire route
+    const stops = route.stops;
+    console.log("Stops:", stops); // Log the stops array
+
+    if (!stops || stops.length < 2) {
+        alert("Need at least 2 stops to generate a path.");
+        return;
+    }
+
+    // Initialize map
+    const map = L.map('map').setView([13.0827, 80.2707], 10); // Default: Chennai
+    console.log("Map initialized:", map); // Log the map object
+
+    // Add OpenStreetMap tiles
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    // Add markers for each stop
+    const markers = [];
+    stops.forEach((stop, index) => {
+        const markerIcon = index === 0 ? "green-dot.png" : 
+                          index === stops.length - 1 ? "red-dot.png" : 
+                          "yellow-dot.png";
+
+        const marker = L.marker([stop.coords[0], stop.coords[1]], {
+            icon: L.icon({
+                iconUrl: `https://maps.google.com/mapfiles/ms/icons/${markerIcon}`,
+                iconSize: [30, 30]
+            })
+        }).addTo(map).bindPopup(`<strong>${stop.stopName}</strong><br>${stop.stopAddress}`);
+
+        markers.push(marker);
+        console.log("Marker added:", marker); // Log each marker
+    });
+
+    // Fit map to show all markers
+    if (markers.length > 0) {
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.1));
+        console.log("Map fitted to bounds:", group.getBounds()); // Log the bounds
+    }
+
+    // Draw route if there are multiple stops
+    if (stops.length > 1) {
+        const points = stops.map(stop => [stop.coords[1], stop.coords[0]]); // Convert to [lon, lat]
+        console.log("Points for GraphHopper:", points); // Log the points
+
+        const apiKey = "131b911d-a302-40a0-8a9a-d498fbf68645"; // GraphHopper API Key
+        const requestBody = {
+            points,
+            profile: "car",
+            locale: "en",
+            instructions: false,
+            calc_points: true,
+            points_encoded: false
+        };
+
+        const response = await fetch(`https://graphhopper.com/api/1/route?key=${apiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+        });
+
+        const routeData = await response.json();
+        console.log("GraphHopper Response:", routeData); // Log the response
+
+        if (routeData.paths && routeData.paths.length > 0) {
+            const route = routeData.paths[0];
+            L.polyline(route.points.coordinates.map(coord => [coord[1], coord[0]]), { 
+                color: "blue", 
+                weight: 5 
+            }).addTo(map);
+            console.log("Route drawn on map"); // Log the route drawing
+        }
+    }
+}
+
+loadRoute();
+  </script>
+</body>
+</html>
